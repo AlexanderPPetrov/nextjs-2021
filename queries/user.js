@@ -5,7 +5,10 @@ export const GET_CURRENT_USER = gql`
 query getCurrentUser {
   currentUser {
     _id
+    firstName
+    lastName
     email
+    roles
   }
 }
 `;

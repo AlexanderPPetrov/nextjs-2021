@@ -13,7 +13,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 
-import { useMutation, useLazyQuery, fromPromise, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { GET_CURRENT_USER } from "../../queries/user";
 import { LOGIN, LOGOUT} from "../../mutations/auth";
 import cookieCutter from 'cookie-cutter'
@@ -39,7 +39,6 @@ const UserMenu = (props) => {
 
       login(loginData).then( response => {
             cookieCutter.set("token", response.data.login)
-            getCurrentUser();
             setModal(false);
       });
     }
