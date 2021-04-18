@@ -15,7 +15,6 @@ MyApp.getInitialProps = async ctx => {
     const data = await getClient(ctx).query({
        query: GET_CURRENT_USER,
     });
-    console.log(data);
     return {
       props: {},
     }

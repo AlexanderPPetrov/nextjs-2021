@@ -3,7 +3,19 @@ import { setContext } from '@apollo/client/link/context';
 import cookieCutter from 'cookie-cutter'
 import Cookies from "cookies"
 
+let globalClient = null;
+
 export const getClient = (ctx) => {
+    if(process.browser){
+        if(!globalClient){
+            globalClient = createClient();
+        }
+        return globalClient
+    }
+    return createClient(ctx);
+}
+
+const createClient = (ctx) => {
     const httpLink = createHttpLink({
         // uri: 'https://graphql-api-2021.herokuapp.com/graphql',
         uri: "http://localhost:3001/graphql",
@@ -17,6 +29,7 @@ export const getClient = (ctx) => {
         const cookies = new Cookies(ctx.ctx.req, ctx.ctx.res)
         token = cookies.get("token");
     }
+
     return {
         headers: {
             ...headers,
@@ -45,5 +58,5 @@ export const getClient = (ctx) => {
         defaultOptions,
     });
 
-    return client;    
+    return client
 }
