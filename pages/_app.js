@@ -1,49 +1,28 @@
 import '../styles/index.scss';
 import { ApolloProvider } from '@apollo/client/react';
-import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
-
-const httpLink = createHttpLink({
-  uri: 'https://graphql-api-2021.herokuapp.com/graphql',
-  credentials: 'same-origin'
-});
-
-const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem('token');
-
-  return {
-    headers: {
-      ...headers,
-      authorization: token ? `Bearer ${token}` : "",
-    }
-  }
-});
-
-
-const defaultOptions = {
-  watchQuery: {
-    fetchPolicy: 'no-cache',
-    errorPolicy: 'ignore',
-  },
-  query: {
-    fetchPolicy: 'no-cache',
-    errorPolicy: 'all',
-  },
-}
-
-const client = new ApolloClient({   
-  link: authLink.concat(httpLink),
-  cache: new InMemoryCache({
-    addTypename: false
-  }),
-  defaultOptions,
-});
+import client from "../apollo-client";
+import { GET_CURRENT_USER } from "../queries/user";
+import Cookies from 'cookies'
 
 function MyApp({ Component, pageProps }) {
   return <ApolloProvider client={client}>
-    <Component {...pageProps} />
+      <Component {...pageProps} />
   </ApolloProvider>
-
 }
 
 export default MyApp
+
+MyApp.getInitialProps = async ctx => {
+    const cookies = new Cookies(ctx.ctx.req, ctx.ctx.res)
+    const token = cookies.get("token");
+    const data = await client.query({
+       query: GET_CURRENT_USER,
+       headers: {
+        authorization: token ? `Bearer ${token}` : ''
+      }
+    });
+    console.log(data);
+    return {
+      props: {},
+    }
+}

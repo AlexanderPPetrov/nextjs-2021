@@ -9,6 +9,7 @@ import {
 } from 'reactstrap'
 import Logo from '../../logo.svg'
 import Link from 'next/link'
+import UserMenu from "../user/UserMenu"
 
 const Navigation = (props) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,7 +33,13 @@ const Navigation = (props) => {
                             <a className="nav-link">Games</a>
                         </Link>
                     </NavItem>
+                    <NavItem>
+                        <Link href='/admin'>
+                            <a className="nav-link">Admin</a>
+                        </Link>
+                    </NavItem>
                 </Nav>
+                <UserMenu/>
             </Collapse>
         </div>
        
