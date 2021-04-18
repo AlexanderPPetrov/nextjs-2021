@@ -1,0 +1,10 @@
+.game-rating {
+    .CircularProgressbar-path {
+        stroke: #fdea00 !important;
+    }
+    .CircularProgressbar-text {
+        font-size: 32px !important;
+        font-weight: bold;
+        dominant-baseline: central !important;
+    }
+}
