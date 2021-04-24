@@ -17,8 +17,7 @@ export const getClient = (ctx) => {
 
 const createClient = (ctx) => {
     const httpLink = createHttpLink({
-        // uri: 'https://graphql-api-2021.herokuapp.com/graphql',
-        uri: "http://localhost:3001/graphql",
+        uri: process.env.API_URL,
         credentials: 'same-origin'
     });
       
@@ -26,10 +25,11 @@ const createClient = (ctx) => {
     // check if it's a browser or SSR
     let token = process.browser ?  cookieCutter.get("token") : ""
     if(ctx){
+        // When there is ctx it's the SSR
         const cookies = new Cookies(ctx.ctx.req, ctx.ctx.res)
         token = cookies.get("token");
     }
-
+    console.log("-------->", token);
     return {
         headers: {
             ...headers,
@@ -38,7 +38,6 @@ const createClient = (ctx) => {
         }
     });
     
-      
     const defaultOptions = {
         watchQuery: {
             fetchPolicy: 'no-cache',
@@ -46,7 +45,7 @@ const createClient = (ctx) => {
         },
         query: {
             fetchPolicy: 'no-cache',
-            errorPolicy: 'all',
+            errorPolicy: 'ignore',
         },
     }
       

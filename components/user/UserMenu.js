@@ -12,8 +12,8 @@ import {
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-
-import { useMutation, useQuery } from '@apollo/client';
+import moment from "moment";
+import { useMutation, useQuery, useLazyQuery } from '@apollo/client';
 import { GET_CURRENT_USER } from "../../queries/user";
 import { LOGIN, LOGOUT} from "../../mutations/auth";
 import cookieCutter from 'cookie-cutter'
@@ -25,24 +25,46 @@ const UserMenu = (props) => {
   
     const [login, { data }] = useMutation(LOGIN);
     const [logout] = useMutation(LOGOUT);
-  
-    const queryData = useQuery(GET_CURRENT_USER);
+
+    const [getCurrentUser, queryData] = useLazyQuery(
+        GET_CURRENT_USER,
+        {  
+            variables: { 
+            email,
+            password,
+        },
+    });
+
+    useEffect(() => {
+        getCurrentUser();
+        console.log('called');
+    }, []);
 
     const onLogin = () => {
-      const loginData = { 
-          variables: { 
-              email,
-              password,
-          },
-          refetchQueries: [{ query: GET_CURRENT_USER }]
-      }
-
+        const loginData = { 
+            variables: { 
+                email,
+                password,
+            }
+        }
       login(loginData).then( response => {
-            cookieCutter.set("token", response.data.login)
+            cookieCutter.set(
+                "token", 
+                response.data.login, 
+                { expires: new moment().add(1, "d")._d 
+            })
+
+            console.log("---->", cookieCutter.get("token"));
+            getCurrentUser();
             setModal(false);
       });
     }
   
+    //TODO handle errors from apollo when wrong credentials
+    // check the render function being called upon changing state
+    // cannot type when autofilled
+    // check how to get the current user from getInitialProps
+    
     const [modal, setModal] = useState(false);
   
     const toggleModal = () => setModal(!modal);
@@ -53,7 +75,7 @@ const UserMenu = (props) => {
         getCurrentUser();
     }
     const getUserMenu = () => {
-      if(queryData.loading || !queryData.called) {
+      if(queryData.loading) {
           return null;
       }
       if(queryData.data && queryData.data.currentUser) {
@@ -64,8 +86,7 @@ const UserMenu = (props) => {
                  onLogout();
             }}>Logout</Button>
         </div>
-        
-      
+
       }
   
       return <Button onClick={()=> {
