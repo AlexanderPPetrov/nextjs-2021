@@ -1,9 +1,28 @@
 import Head from 'next/head'
 import DefaultLayout from '../../components/layouts/Default'
-import { client } from "@apollo/client"
-import { GET_CURRENT_USER } from "../../queries/user";
+import { wrapper } from "../../redux/wrapper";
 
-export default function Admin() {
+export const getServerSideProps = wrapper.getServerSideProps(async ({ req, res, store }) => {
+  const state = store.getState();
+  const currentUser = state.currentUser
+  if(!currentUser.roles || !currentUser.roles.includes("ADMIN")){
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+  }
+  return {
+    props: {
+      currentUser,
+    },
+  };
+});
+
+
+export default function Admin(props) {
+
   return (
     <DefaultLayout>
       <Head>

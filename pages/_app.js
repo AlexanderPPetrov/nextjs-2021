@@ -9,7 +9,11 @@ class WrappedApp extends App {
   static getInitialProps = async ({ Component, ctx }) => {
     // Keep in mind that this will be called twice on server, one for page and second for error page
     
-    ctx.store.dispatch(getCurrentUser(ctx));
+    const response = await ctx.store.dispatch(getCurrentUser(ctx));
+    let currentUser = {};
+    if(response?.data?.currentUser){
+      currentUser = response.data.currentUser;
+    }
     return {
       pageProps: {
         // Call page-level getInitialProps
@@ -17,7 +21,11 @@ class WrappedApp extends App {
           ? await Component.getInitialProps(ctx)
           : {}),
         // Some custom thing for all pages
-        appProp: ctx.pathname
+        appProp: ctx.pathname,
+        currentUser,
+      },
+      props: {
+        currentUser,
       }
     };
   };

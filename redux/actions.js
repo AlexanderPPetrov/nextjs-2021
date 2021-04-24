@@ -34,6 +34,7 @@ export const getCurrentUser = (ctx) => async dispatch => {
         if(response?.data?.currentUser){
             dispatch(setCurrenUser(response.data.currentUser));
         }
+        return response;
     } catch (error) {
         if(process.browser) {
             cookieCutter.set('token', '', { expires: new Date(0) })
@@ -60,6 +61,7 @@ export const login = variables => async dispatch => {
             })
             dispatch(getCurrentUser());
         }
+        return response;
     } catch (error) {
         console.log(error)
     }
@@ -74,6 +76,7 @@ export const logout = () => async dispatch => {
             cookieCutter.set('token', '', { expires: new Date(0) })
             dispatch(setCurrenUser({}));
         }
+        return response;
     } catch (error) {
         console.log(error)
     }

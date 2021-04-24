@@ -1,5 +1,6 @@
 import actions from './action-types';
 import {combineReducers} from 'redux';
+import { HYDRATE } from 'next-redux-wrapper';
 
 function games(state = [], action) {
     switch(action.type) {
@@ -11,10 +12,12 @@ function games(state = [], action) {
     }
 }
 function currentUser(state = {}, action) {
-    console.log(action)
     switch(action.type) {
         case actions.SET_CURRENT_USER: {
             return {...action.payload}
+        }
+        case HYDRATE: {
+            return action.payload.currentUser
         }
         default:
             return state;

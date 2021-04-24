@@ -12,11 +12,7 @@ import {
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-import moment from "moment";
-import { useMutation, useQuery, useLazyQuery } from '@apollo/client';
-import { GET_CURRENT_USER } from "../../queries/user";
-import { LOGIN, LOGOUT} from "../../mutations/auth";
-import cookieCutter from 'cookie-cutter'
+import { useRouter } from 'next/router'
 
 import {useSelector, useDispatch} from "react-redux";
 import { login, logout } from '../../redux/actions';
@@ -28,27 +24,28 @@ const UserMenu = (props) => {
 
     const currentUser = useSelector(state => state.currentUser);
     const dispatch = useDispatch();
+    const router = useRouter();
 
-    const onLogin = () => {
+    const onLogin = async () => {
         const variables = { 
             email,
             password,
         }
-        dispatch(login(variables))
-        //setModal(false);
+        const response = await dispatch(login(variables))
+        if(response){
+            setModal(false);
+        }
     }
   
     //TODO handle errors from apollo when wrong credentials
-    // check the render function being called upon changing state
-    // cannot type when autofilled
-    // check how to get the current user from getInitialProps
 
     const [modal, setModal] = useState(false);
   
     const toggleModal = () => setModal(!modal);
   
-    const onLogout = () => {
-        dispatch(logout());
+    const onLogout = async () => {
+        const response = await dispatch(logout());
+        router.push("/");
     }
     const getUserMenu = () => {
       if(currentUser._id) {
