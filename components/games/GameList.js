@@ -1,27 +1,22 @@
-import { useQuery, gql } from '@apollo/client';
 import GameItem from "./GameItem";
 
-const GET_GAMES = gql`
-  query getGames {
-    games {
-      _id
-      title
-      description
-      image
-      rating
-    }
-  }
-`;
+import {useSelector, useDispatch} from "react-redux";
+import { useEffect } from "react";
+import { getGames } from "../../redux/actions";
 
 function GamesList(props) {
 
-    const { loading, error, data } = useQuery(GET_GAMES);
+    const games = useSelector(state => state.games);
 
-    const getGames = () => {
-        if(!data){
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(getGames());
+    }, []);
+    const getGamesList = () => {
+        if(!games.length){
             return null;
         }
-        const gamesList = data.games.map(game => {
+        const gamesList = games.map(game => {
             return <GameItem
                 key={game._id}
                 title={game.title}
@@ -35,7 +30,7 @@ function GamesList(props) {
 
     return <>
         <div className="row">
-            { getGames() }
+            { getGamesList() }
         </div>
     </>
 }

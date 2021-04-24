@@ -1,30 +1,31 @@
 import '../styles/index.scss';
-import { ApolloProvider } from '@apollo/client/react';
-import { getClient } from "../apollo-client";
-import { GET_CURRENT_USER } from "../queries/user";
-import Cookies from "cookies"
 
-function MyApp({ Component, pageProps }) {
-  return <ApolloProvider client={getClient()}>
-      <Component {...pageProps} />
-  </ApolloProvider>
-}
+import App from "next/app";
+import { wrapper } from "../redux/wrapper";
 
-export default MyApp
+import { getCurrentUser } from '../redux/actions';
 
-MyApp.getInitialProps = async ctx => {
-    let currentUser = {};
-    try {
-      currentUser = await getClient(ctx).query({
-        query: GET_CURRENT_USER,
-      });
-    } catch (e) {
-      const cookies = new Cookies(ctx.ctx.req, ctx.ctx.res)
-      cookies.set("token", "", { expires: new Date(0) })
-    }
+class WrappedApp extends App {
+  static getInitialProps = async ({ Component, ctx }) => {
+    // Keep in mind that this will be called twice on server, one for page and second for error page
+    
+    ctx.store.dispatch(getCurrentUser(ctx));
     return {
-      props: {
-        currentUser,
-      },
-    }
+      pageProps: {
+        // Call page-level getInitialProps
+        ...(Component.getInitialProps
+          ? await Component.getInitialProps(ctx)
+          : {}),
+        // Some custom thing for all pages
+        appProp: ctx.pathname
+      }
+    };
+  };
+
+  render() {
+    const { Component, pageProps } = this.props;
+    return <Component {...pageProps} />;
+  }
 }
+
+export default wrapper.withRedux(WrappedApp);

@@ -26,10 +26,9 @@ const createClient = (ctx) => {
     let token = process.browser ?  cookieCutter.get("token") : ""
     if(ctx){
         // When there is ctx it's the SSR
-        const cookies = new Cookies(ctx.ctx.req, ctx.ctx.res)
+        const cookies = new Cookies(ctx.req, ctx.res)
         token = cookies.get("token");
     }
-    console.log("-------->", token);
     return {
         headers: {
             ...headers,
